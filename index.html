@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Registro de horas de espera de los conductores de Transportes Stange.">
+  <title>Horas de espera</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icono-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="icono-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="HDE Stange">
+  <script src="config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Archivo:wght@400;500&family=Chivo+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Wayfind × Formwork (by request: mezcla B) · seed app-movil-conductores-camion-28ee·f196c768·2026-11-21·r0
+ * nav: ink plate top bar, wordmark and one quiet action · signature: the waiting-time ticket, the driver's WhatsApp message set as a stamped departure slip · states: loading, empty, error, pending, full · ground: cool grey
+ * axes: light/condensed-grotesk/safety-orange · posture: committed · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: E, orange kept to the send and download actions, the form's edge, the stamp and the amount to bill */
+
+/* ---------- tokens ---------- */
+:root {
+  color-scheme: light;
+  --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px;
+  --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.2rem; --text-xl: 1.44rem; --text-2xl: 1.728rem; --text-3xl: 2.074rem;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-micro: 120ms; --dur-short: 220ms;
+  --color-error: oklch(50% 0.19 27); --color-error-soft: oklch(95% 0.03 27);
+  --container: 1240px; --container-narrow: 560px; --gutter: 32px;
+  --z-sticky: 200; --z-modal: 400; --z-toast: 500;
+  --color-paper: oklch(95.5% 0.006 250); --color-paper-2: oklch(91% 0.009 250); --color-paper-3: oklch(87% 0.01 250);
+  --color-surface: oklch(99.5% 0.005 250);
+  --color-ink: oklch(16% 0.014 262); --color-ink-2: oklch(30% 0.014 262); --color-muted: oklch(47% 0.016 260);
+  --color-rule: oklch(80% 0.011 250);
+  --color-accent: oklch(66% 0.21 38); --color-accent-deep: oklch(60% 0.2 38); --color-accent-text: oklch(50% 0.18 38);
+  --color-accent-soft: oklch(93% 0.045 50); --color-accent-ink: oklch(16% 0.014 262);
+  --color-on-ink: oklch(95.5% 0.006 250); --color-on-ink-muted: oklch(75% 0.012 250);
+  --color-focus: oklch(55% 0.2 38);
+  --color-scrim: oklch(16% 0.014 262 / 0.5);
+  --font-display: "Oswald", "Arial Narrow", ui-sans-serif, sans-serif;
+  --font-body: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-outlier: "Chivo Mono", ui-monospace, monospace;
+  --radius-card: 0; --radius-input: 0; --radius-pill: 0; --rule-hair: 1px; --rule-bar: 2px;
+  --tracking-display: 0;
+  --control: 52px; --control-app: 40px;
+}
+@media (max-width: 40rem) { :root { --gutter: 16px; } }
+
+/* ---------- base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+html { scrollbar-color: var(--color-muted) var(--color-paper); }
+body { margin: 0; min-height: 100vh; background: var(--color-paper); color: var(--color-ink);
+  font-family: var(--font-body); font-size: var(--text-md); line-height: 1.5; -webkit-font-smoothing: antialiased; caret-color: var(--color-accent-deep); }
+::selection { background: var(--color-accent-soft); color: var(--color-ink); }
+:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+a { color: var(--color-accent-text); text-decoration-thickness: 1px; text-underline-offset: 0.16em; }
+h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 700; font-synthesis: none; letter-spacing: var(--tracking-display);
+  line-height: 1.05; overflow-wrap: break-word; min-width: 0; text-wrap: balance; color: var(--color-ink); }
+h1 { font-size: var(--text-3xl); } h2 { font-size: var(--text-xl); font-weight: 500; } h3 { font-size: var(--text-lg); line-height: 1.2; }
+p { margin: 0; text-wrap: pretty; }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.num { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--font-outlier); font-variant-numeric: tabular-nums; }
+.muted { color: var(--color-muted); }
+.small { font-size: var(--text-sm); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.wrap { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+.wrap--narrow { max-width: var(--container-narrow); }
+.stack > * + * { margin-top: var(--space-md); }
+
+/* ---------- top bar: ink plate ---------- */
+.bar { position: sticky; top: 0; z-index: var(--z-sticky); background: var(--color-ink); color: var(--color-on-ink); }
+.bar__in { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); min-height: 56px; }
+.wordmark { font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg); color: var(--color-on-ink); text-decoration: none; white-space: nowrap; }
+.bar__side { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--text-sm); color: var(--color-on-ink-muted); white-space: nowrap; }
+@media (max-width: 26rem) { .wordmark { font-size: var(--text-md); } }
+.net { font-size: var(--text-sm); color: var(--color-on-ink-muted); font-family: var(--font-outlier); }
+.net[data-state="online"] { color: var(--color-accent); }
+.net[data-state="offline"], .net[data-state="pending"] { color: var(--color-on-ink); }
+.bar .link { color: var(--color-on-ink); text-decoration-color: var(--color-accent); }
+.bar .link:hover { color: var(--color-accent); }
+
+/* ---------- buttons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs); min-height: var(--control); padding: 0 var(--space-lg);
+  border: var(--rule-bar) solid var(--color-ink); border-radius: var(--radius-input); background: transparent; color: var(--color-ink);
+  font: 500 var(--text-md) var(--font-body); cursor: pointer; text-decoration: none; white-space: nowrap;
+  box-shadow: 3px 3px 0 var(--color-ink);
+  transition: transform var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out); }
+.btn:hover { background: var(--color-paper-2); }
+.btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--color-ink); }
+.btn:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
+.btn:disabled, .btn[aria-busy="true"] { opacity: 0.55; cursor: not-allowed; transform: none; }
+.btn--primary { background: var(--color-accent); color: var(--color-accent-ink); font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg); }
+.btn--primary:hover { background: var(--color-accent-deep); }
+.btn--block { width: 100%; }
+.btn--sm { min-height: 32px; padding: 0 var(--space-sm); font-size: var(--text-sm); box-shadow: 2px 2px 0 var(--color-ink); border-width: 1.5px; }
+.btn--sm:active { transform: translate(2px, 2px); }
+.link { background: none; border: 0; padding: var(--space-xs) 0; min-height: 44px; color: var(--color-ink); font: 500 var(--text-sm) var(--font-body);
+  cursor: pointer; text-decoration: underline; text-decoration-color: var(--color-accent); text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
+.link:hover { color: var(--color-accent-text); }
+.link:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+
+/* ---------- fields ---------- */
+.field { display: flex; flex-direction: column; gap: var(--space-2xs); min-width: 0; }
+.field label, .label { font-size: var(--text-sm); font-weight: 500; color: var(--color-ink-2); }
+.field .help { min-height: 1lh; font-size: var(--text-sm); color: var(--color-muted); }
+.input { width: 100%; min-height: var(--control); padding: 0 var(--space-md); border: var(--rule-bar) solid var(--color-ink); border-radius: var(--radius-input);
+  background: var(--color-surface); color: var(--color-ink); font-size: max(16px, var(--text-md));
+  transition: background-color var(--dur-micro) var(--ease-out); }
+.input:hover { background: var(--color-paper); }
+.input:focus-visible { outline: 3px solid var(--color-focus); outline-offset: -3px; }
+.input[aria-invalid="true"] { border-color: var(--color-error); background: var(--color-error-soft); }
+.input:disabled { opacity: 0.55; cursor: not-allowed; }
+.input--mono { font-family: var(--font-outlier); font-variant-numeric: tabular-nums; }
+select.input { appearance: auto; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-md); }
+@media (max-width: 22rem) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- tray: the form panel, orange edge ---------- */
+.tray { position: relative; padding: var(--space-lg) var(--space-md); background: var(--color-paper-2); box-shadow: inset 4px 0 0 var(--color-accent); padding-left: var(--space-lg); }
+
+/* ---------- surfaces ---------- */
+.card { background: var(--color-surface); border: var(--rule-bar) solid var(--color-ink); padding: var(--space-lg); }
+
+/* ---------- the ticket (signature) ---------- */
+.ticket { position: relative; background: var(--color-surface); border: var(--rule-bar) solid var(--color-ink); box-shadow: 4px 4px 0 var(--color-ink);
+  font-family: var(--font-outlier); font-variant-numeric: tabular-nums; color: var(--color-ink); overflow: hidden; }
+.ticket__body { padding: var(--space-md) var(--space-md) var(--space-sm); display: grid; gap: var(--space-2xs); }
+.ticket__head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-sm); font-size: var(--text-lg); font-weight: 500; }
+.ticket__row { display: flex; justify-content: space-between; gap: var(--space-sm); font-size: var(--text-sm); }
+.ticket__row span:first-child { color: var(--color-muted); }
+.ticket__total { display: flex; justify-content: space-between; align-items: baseline; padding-top: var(--space-xs); margin-top: var(--space-2xs);
+  border-top: var(--rule-bar) solid var(--color-ink); font-size: var(--text-xl); font-weight: 500; }
+.ticket__stub { border-top: 2px dashed var(--color-rule); padding: var(--space-xs) var(--space-md); font-size: var(--text-xs); color: var(--color-muted);
+  display: flex; justify-content: space-between; gap: var(--space-sm); background: var(--color-paper); }
+.ticket--empty .ticket__head, .ticket--empty .ticket__total { color: var(--color-muted); }
+.stamp { justify-self: end; margin-top: var(--space-xs); transform: rotate(-4deg); padding: var(--space-2xs) var(--space-sm);
+  border: 2px solid currentColor; outline: 1px solid currentColor; outline-offset: 2px; color: var(--color-accent-text);
+  font: 500 var(--text-sm) var(--font-outlier); background: var(--color-surface); pointer-events: none; }
+.stamp--pending { color: var(--color-muted); }
+.stamp[data-land] { animation: land var(--dur-short) var(--ease-out); }
+@keyframes land { from { opacity: 0; transform: rotate(-4deg) scale(1.25); } to { opacity: 1; transform: rotate(-4deg) scale(1); } }
+
+/* ---------- small list of tickets ---------- */
+.mini { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: var(--rule-bar) solid var(--color-ink); }
+.mini li { border-bottom: var(--rule-hair) solid var(--color-rule); padding: var(--space-sm) 0;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-3xs) var(--space-sm); font-size: var(--text-sm); }
+.mini .mono { font-size: var(--text-sm); }
+.tag { display: inline-flex; align-items: center; min-height: 24px; padding: 0 var(--space-xs); border-radius: var(--radius-pill);
+  font-size: var(--text-xs); font-weight: 500; background: var(--color-accent-soft); color: var(--color-accent-text); white-space: nowrap; }
+.tag--grey { background: var(--color-paper-3); color: var(--color-ink-2); }
+.tag--line { background: none; box-shadow: inset 0 0 0 1px var(--color-ink); color: var(--color-ink-2); }
+
+/* ---------- notices ---------- */
+.notice { padding: var(--space-sm) var(--space-md); font-size: var(--text-sm); background: var(--color-paper-3); color: var(--color-ink); }
+.notice--error { background: var(--color-error-soft); color: var(--color-error); box-shadow: inset 4px 0 0 var(--color-error); }
+.notice--ok { background: var(--color-accent-soft); color: var(--color-ink); box-shadow: inset 4px 0 0 var(--color-accent); }
+
+/* ---------- loading skeleton ---------- */
+.skeleton { display: block; height: 52px; background: linear-gradient(90deg, var(--color-paper-2), var(--color-paper-3), var(--color-paper-2));
+  background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+.skeleton + .skeleton { margin-top: var(--space-sm); }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ---------- toast ---------- */
+.toast { position: fixed; left: 50%; bottom: var(--space-lg); z-index: var(--z-toast); transform: translateX(-50%); max-width: min(92vw, 420px);
+  padding: var(--space-sm) var(--space-md); background: var(--color-ink); color: var(--color-on-ink); font-size: var(--text-sm);
+  box-shadow: inset 4px 0 0 var(--color-accent); }
+
+/* ---------- table (admin) ---------- */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+th, td { padding: var(--space-xs) var(--space-sm); text-align: left; border-bottom: var(--rule-hair) solid var(--color-rule); white-space: nowrap; vertical-align: middle; }
+th { font-weight: 500; color: var(--color-muted); border-bottom: var(--rule-bar) solid var(--color-ink); }
+td.num, th.num { text-align: right; }
+tbody tr:hover td { background: var(--color-paper-2); }
+tr[data-estado="ANULADA"] td { color: var(--color-muted); text-decoration: line-through; }
+tr[data-estado="EN CURSO"] td:first-child { box-shadow: inset 4px 0 0 var(--color-accent); }
+
+/* ---------- dialog ---------- */
+dialog { border: var(--rule-bar) solid var(--color-ink); padding: 0; width: min(620px, 94vw); background: var(--color-paper); color: var(--color-ink); box-shadow: 6px 6px 0 var(--color-ink); }
+dialog::backdrop { background: var(--color-scrim); }
+
+/* ---------- motion safety ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+</style>
+
+  <style>
+    main { padding-block: var(--space-lg) var(--space-2xl); }
+    .intro { display: grid; gap: var(--space-xs); margin-bottom: var(--space-lg); }
+    .actions { display: grid; gap: var(--space-sm); margin-top: var(--space-lg); }
+    .section-title { margin: var(--space-xl) 0 var(--space-sm); }
+    .note { font-size: var(--text-sm); color: var(--color-ink-2); }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <div class="wrap wrap--narrow bar__in">
+      <span class="wordmark" id="empresa">Transportes Stange</span>
+      <div class="bar__side">
+        <span class="net" id="net" data-state="online">En línea</span>
+        <button type="button" class="link" id="btnCambiar" hidden aria-label="Cambiar nombre del conductor">Cambiar</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap wrap--narrow">
+    <div id="avisoCola" class="notice" role="status" hidden></div>
+    <div id="aviso" class="notice notice--error" role="alert" hidden></div>
+
+    <!-- PIN -->
+    <section id="vPin" aria-labelledby="tPin">
+      <div class="intro">
+        <h1 id="tPin">Horas de espera</h1>
+        <p class="muted">Ingresa el PIN de conductores para registrar una espera.</p>
+      </div>
+      <form id="fPin" class="tray stack" novalidate>
+        <div class="field">
+          <label for="pin">PIN</label>
+          <input class="input input--mono" id="pin" name="pin" type="password" inputmode="numeric" autocomplete="off" required>
+        </div>
+        <button type="submit" class="btn btn--primary btn--block" id="btnPin">Entrar</button>
+      </form>
+    </section>
+
+    <!-- Nombre -->
+    <section id="vNombre" aria-labelledby="tNombre" hidden>
+      <div class="intro">
+        <h1 id="tNombre">¿Quién eres?</h1>
+        <p class="muted">Elige tu nombre una vez; el celular lo recordará.</p>
+      </div>
+      <form id="fNombre" class="tray stack" novalidate>
+        <div class="field">
+          <label for="nombre">Nombre</label>
+          <input class="input" id="nombre" name="nombre" list="dlConductores" autocomplete="off" placeholder="Escribe o elige tu nombre" required>
+          <datalist id="dlConductores"></datalist>
+        </div>
+        <button type="submit" class="btn btn--primary btn--block">Continuar</button>
+      </form>
+    </section>
+
+    <!-- Formulario único -->
+    <section id="vForm" aria-labelledby="tForm" hidden>
+      <div class="intro">
+        <h1 id="tForm">Nueva hora de espera</h1>
+        <p class="muted" id="hola"></p>
+      </div>
+
+      <form id="fEspera" class="tray stack" novalidate>
+        <div class="grid2">
+          <div class="field">
+            <label for="equipo">Equipo</label>
+            <input class="input input--mono" id="equipo" name="equipo" list="dlEquipos" inputmode="numeric" autocomplete="off" placeholder="8976" required>
+          </div>
+          <div class="field">
+            <label for="localidad">Cliente o localidad</label>
+            <input class="input" id="localidad" name="localidad" list="dlLocalidades" autocomplete="off" placeholder="Coñaripe" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fecha">Fecha de llegada</label>
+          <input class="input input--mono" id="fecha" name="fecha" type="date" required>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="llegada">Hora de llegada</label>
+            <input class="input input--mono" id="llegada" name="llegada" type="time" required>
+          </div>
+          <div class="field">
+            <label for="descarga">Inicio de descarga</label>
+            <input class="input input--mono" id="descarga" name="descarga" type="time" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="doc">Documento de transporte (DT)</label>
+          <input class="input input--mono" id="doc" name="doc" inputmode="numeric" autocomplete="off" placeholder="2012046537" maxlength="10" pattern="[0-9]{10}" aria-describedby="docHelp" required>
+          <span class="help" id="docHelp">10 dígitos.</span>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="deposito">Depósito</label>
+            <select class="input input--mono" id="deposito" name="deposito"></select>
+          </div>
+          <div class="field">
+            <label for="obs">Observación</label>
+            <input class="input" id="obs" name="obs" autocomplete="off" placeholder="Opcional">
+          </div>
+        </div>
+        <datalist id="dlEquipos"></datalist>
+        <datalist id="dlLocalidades"></datalist>
+      </form>
+
+      <h2 class="section-title" id="tTicket">Así se envía</h2>
+      <article class="ticket" id="ticket" aria-labelledby="tTicket" aria-live="polite"></article>
+      <p class="note" id="nota" hidden>La descarga empezó al día siguiente de la llegada.</p>
+
+      <div class="actions">
+        <button type="submit" form="fEspera" class="btn btn--primary btn--block" id="btnEnviar">Enviar hora de espera</button>
+        <button type="button" class="btn btn--block" id="btnOtra" hidden>Registrar otra espera</button>
+      </div>
+
+      <h2 class="section-title">Mis envíos</h2>
+      <div id="lista" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><p class="wrap wrap--narrow">Activa JavaScript para usar el registro de horas de espera.</p></noscript>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var LS = {
+    get: function (k, d) { try { var v = localStorage.getItem('hde2_' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set: function (k, v) { try { localStorage.setItem('hde2_' + k, JSON.stringify(v)); } catch (e) {} },
+    del: function (k) { try { localStorage.removeItem('hde2_' + k); } catch (e) {} }
+  };
+  var st = {
+    pin: '', cat: LS.get('catalogos', null), nombre: LS.get('nombre', ''),
+    cola: LS.get('cola', []), envios: LS.get('envios', []), enviando: false, ultimo: null
+  };
+
+  /* ---------- utilidades ---------- */
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function hoyISO() { var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function horaAhora() { var d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function aDate(s) { var p = s.split(/[-T:]/); return new Date(+p[0], p[1] - 1, +p[2], +p[3] || 0, +p[4] || 0); }
+  function iso(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function diaMes(s) { var p = s.split(/[-T:]/); return p[2] + '-' + p[1]; }
+  function hhmm(s) { return s ? s.slice(11, 16) : ''; }
+  function dur(ini, fin) { var m = Math.round((aDate(fin) - aDate(ini)) / 60000); return Math.floor(m / 60) + ' h ' + pad(m % 60) + ' min'; }
+  function uid() { return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function toast(m) { var t = $('toast'); t.textContent = m; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(function () { t.hidden = true; }, 3500); }
+  function aviso(m) { $('aviso').textContent = m || ''; $('aviso').hidden = !m; if (m) window.scrollTo(0, 0); }
+  function esErrorRed(e) { var m = String((e && e.message) || e); return !navigator.onLine || /network|failed to fetch|http 0|conexi|timeout|timed out/i.test(m); }
+  // Dentro de Google usa google.script.run; publicada como página web propia usa APP_URL (config.js).
+  function api(fn) {
+    var a = Array.prototype.slice.call(arguments, 1);
+    if (window.google && google.script && google.script.run) {
+      return new Promise(function (ok, ko) { var r = google.script.run.withSuccessHandler(ok).withFailureHandler(ko); r[fn].apply(r, a); });
+    }
+    if (!window.APP_URL) return Promise.reject(new Error('Falta configurar APP_URL en config.js.'));
+    return fetch(window.APP_URL, { method: 'POST', redirect: 'follow', credentials: 'omit',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn: fn, args: a }) })
+      .then(function (r) { if (!r.ok) throw new Error('NetworkError HTTP ' + r.status); return r.json(); })
+      .then(function (j) { if (!j.ok) throw new Error(j.error); return j.data; });
+  }
+  function opciones(id, items) { $(id).innerHTML = items.map(function (x) { return '<option value="' + esc(x) + '">'; }).join(''); }
+
+  /* ---------- pantallas ---------- */
+  function ver(v) {
+    ['vPin', 'vNombre', 'vForm'].forEach(function (id) { $(id).hidden = id !== v; });
+    $('btnCambiar').hidden = v !== 'vForm';
+  }
+  function aplicarCatalogo() {
+    var c = st.cat; if (!c) return;
+    opciones('dlConductores', c.conductores); opciones('dlEquipos', c.equipos); opciones('dlLocalidades', c.localidades);
+    var dep = LS.get('deposito', c.depositos[0]);
+    $('deposito').innerHTML = c.depositos.map(function (x) { return '<option' + (x === dep ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('');
+    if (c.empresa) $('empresa').textContent = c.empresa;
+  }
+
+  /* ---------- PIN ---------- */
+  $('fPin').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var pin = $('pin').value.trim();
+    if (!pin) { $('pin').setAttribute('aria-invalid', 'true'); $('pin').focus(); return; }
+    $('btnPin').setAttribute('aria-busy', 'true'); $('btnPin').textContent = 'Verificando';
+    api('entrarConductor', pin).then(function (c) {
+      st.pin = pin; st.cat = c; LS.set('catalogos', c); LS.set('pinOk', pin);
+      entrar();
+    }, function (err) {
+      if (esErrorRed(err) && LS.get('pinOk', '') === pin && st.cat) { st.pin = pin; entrar(); return; }
+      $('pin').setAttribute('aria-invalid', 'true'); $('pin').focus();
+      aviso(esErrorRed(err) ? 'Sin señal. Intenta de nuevo cuando tengas conexión.' : 'PIN incorrecto. Pídelo al administrador.');
+    }).then(function () { $('btnPin').removeAttribute('aria-busy'); $('btnPin').textContent = 'Entrar'; });
+  });
+  $('pin').addEventListener('input', function () { this.removeAttribute('aria-invalid'); aviso(''); });
+
+  function entrar() {
+    aviso(''); aplicarCatalogo();
+    if (!st.nombre) { ver('vNombre'); $('nombre').focus(); return; }
+    abrirFormulario();
+  }
+
+  /* ---------- nombre ---------- */
+  $('fNombre').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = $('nombre').value.trim().toLowerCase();
+    var m = st.cat.conductores.filter(function (c) { return c.toLowerCase() === v; })[0];
+    if (!m) { $('nombre').setAttribute('aria-invalid', 'true'); aviso('Elige tu nombre de la lista. Si no apareces, avisa al administrador.'); return; }
+    st.nombre = m; LS.set('nombre', m); aviso(''); abrirFormulario();
+  });
+  $('btnCambiar').addEventListener('click', function () { st.nombre = ''; LS.del('nombre'); $('nombre').value = ''; ver('vNombre'); });
+
+  /* ---------- formulario ---------- */
+  var CAMPOS = [['equipo', 'Equipo'], ['localidad', 'Cliente o localidad'], ['fecha', 'Fecha de llegada'],
+                ['llegada', 'Hora de llegada'], ['descarga', 'Inicio de descarga'], ['doc', 'Documento de transporte']];
+
+  function limpiarFormulario() {
+    $('fEspera').reset(); aplicarCatalogo();
+    $('equipo').value = LS.get('equipo', ''); $('fecha').value = hoyISO(); $('fecha').max = hoyISO();
+    CAMPOS.forEach(function (c) { $(c[0]).removeAttribute('aria-invalid'); });
+    st.ultimo = null; $('btnEnviar').hidden = false; $('btnOtra').hidden = true;
+    pintarTicket();
+  }
+  function abrirFormulario() {
+    $('hola').textContent = 'Hola, ' + st.nombre + '. Completa los datos como en el mensaje de WhatsApp.';
+    limpiarFormulario(); ver('vForm'); pintarLista(); refrescar();
+  }
+
+  function leerFormulario() {
+    var f = $('fecha').value, ll = $('llegada').value, de = $('descarga').value;
+    var r = { equipo: $('equipo').value.trim(), localidad: $('localidad').value.trim(), doc: $('doc').value.trim(),
+              deposito: $('deposito').value, obs: $('obs').value.trim(), inicio: '', termino: '', diaSiguiente: false };
+    if (f && ll) r.inicio = f + 'T' + ll;
+    if (f && de) {
+      var t = aDate(f + 'T' + de);
+      if (r.inicio && t <= aDate(r.inicio)) { t.setDate(t.getDate() + 1); r.diaSiguiente = true; }
+      r.termino = iso(t);
+    }
+    return r;
+  }
+
+  function filaTicket(k, v) { return '<div class="ticket__row"><span>' + k + '</span><span>' + v + '</span></div>'; }
+  function pintarTicket() {
+    var r = st.ultimo || leerFormulario();
+    var vacio = !r.equipo && !r.localidad && !r.inicio;
+    var sello = '';
+    if (st.ultimo) {
+      sello = st.ultimo.pendiente
+        ? '<div class="stamp stamp--pending" data-land>Por enviar</div>'
+        : '<div class="stamp" data-land>Recibido ' + esc(hhmm(st.ultimo.registrado || '')) + '</div>';
+    }
+    var html = '<div class="ticket__body">' +
+      '<div class="ticket__head"><span>' + esc(r.equipo || 'Equipo') + '</span><span>' + esc(r.localidad || 'Localidad') + '</span></div>' +
+      filaTicket('Llegada', r.inicio ? esc(diaMes(r.inicio) + ' ' + hhmm(r.inicio)) : '--:--') +
+      filaTicket('Inicio de descarga', r.termino ? esc(diaMes(r.termino) + ' ' + hhmm(r.termino)) : '--:--') +
+      filaTicket('DT', esc(r.doc || '')) +
+      '<div class="ticket__total"><span>Espera</span><span>' + (r.inicio && r.termino ? dur(r.inicio, r.termino) : '0 h 00 min') + '</span></div>' +
+      sello + '</div><div class="ticket__stub"><span>' + esc(st.nombre) + '</span><span>Depósito ' + esc(r.deposito || '') + '</span></div>';
+    $('ticket').className = 'ticket' + (vacio ? ' ticket--empty' : '');
+    $('ticket').innerHTML = html;
+    $('nota').hidden = !r.diaSiguiente;
+  }
+  $('doc').addEventListener('input', function () {
+    var limpio = this.value.replace(/\D/g, '').slice(0, 10);
+    if (limpio !== this.value) this.value = limpio;
+    var n = limpio.length;
+    $('docHelp').textContent = n === 10 ? '10 dígitos.' : (n ? 'Llevas ' + n + ' de 10 dígitos.' : '10 dígitos.');
+  });
+  $('fEspera').addEventListener('input', function (e) {
+    if (e.target.hasAttribute('aria-invalid')) e.target.removeAttribute('aria-invalid');
+    if (!st.ultimo) pintarTicket();
+  });
+
+  $('fEspera').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (st.ultimo) return;
+    var falta = CAMPOS.filter(function (c) { return !$(c[0]).value.trim(); });
+    CAMPOS.forEach(function (c) { if (falta.indexOf(c) >= 0) $(c[0]).setAttribute('aria-invalid', 'true'); else $(c[0]).removeAttribute('aria-invalid'); });
+    if (falta.length) { aviso('Falta completar: ' + falta.map(function (c) { return c[1]; }).join(', ') + '.'); $(falta[0][0]).focus(); return; }
+    var r = leerFormulario();
+    if (!/^\d{10}$/.test(r.doc)) {
+      $('doc').setAttribute('aria-invalid', 'true'); aviso('El documento de transporte debe tener exactamente 10 dígitos.'); $('doc').focus(); return;
+    }
+    if (aDate(r.termino) - aDate(r.inicio) > 20 * 3600000) {
+      if (!confirm('La espera calculada es de ' + dur(r.inicio, r.termino) + '. ¿Está bien?')) return;
+    }
+    if (aDate(r.termino) > new Date(Date.now() + 10 * 60000)) {
+      $('descarga').setAttribute('aria-invalid', 'true'); aviso('El inicio de descarga no puede ser una hora futura.'); $('descarga').focus(); return;
+    }
+    aviso('');
+    var d = { clientId: uid(), conductor: st.nombre, equipo: r.equipo, localidad: r.localidad, doc: r.doc,
+              deposito: r.deposito, obs: r.obs, inicio: r.inicio, termino: r.termino };
+    LS.set('equipo', r.equipo); LS.set('deposito', r.deposito);
+    var fila = Object.assign({}, d, { pendiente: true, diaSiguiente: r.diaSiguiente });
+    st.ultimo = fila; st.envios.unshift(fila); st.envios = st.envios.slice(0, 15);
+    guardar(); pintarTicket(); pintarLista();
+    $('btnEnviar').hidden = true; $('btnOtra').hidden = false;
+    encolar({ fn: 'registrarEspera', pin: st.pin, data: d });
+  });
+  $('btnOtra').addEventListener('click', function () { limpiarFormulario(); $('localidad').focus(); });
+
+  /* ---------- envío con cola (sin señal) ---------- */
+  function guardar() { LS.set('cola', st.cola); LS.set('envios', st.envios); }
+  function pintarRed() {
+    var n = st.cola.length, net = $('net');
+    if (!navigator.onLine) { net.dataset.state = 'offline'; net.textContent = 'Sin señal'; }
+    else if (n) { net.dataset.state = 'pending'; net.textContent = 'Enviando'; }
+    else { net.dataset.state = 'online'; net.textContent = 'En línea'; }
+    $('avisoCola').hidden = !n;
+    $('avisoCola').textContent = n ? (n === 1 ? 'Una espera quedó guardada en el celular. Se enviará sola cuando haya señal.'
+                                               : n + ' esperas quedaron guardadas en el celular. Se enviarán solas cuando haya señal.') : '';
+  }
+  function encolar(op) { st.cola.push(op); guardar(); pintarRed(); return enviarCola(); }
+  function enviarCola() {
+    if (st.enviando || !st.cola.length) return Promise.resolve();
+    st.enviando = true;
+    var op = st.cola[0];
+    return api(op.fn, op.pin, op.data).then(function (res) {
+      st.cola.shift(); st.enviando = false;
+      st.envios = st.envios.map(function (u) { return u.clientId === res.clientId ? res : u; });
+      if (st.ultimo && st.ultimo.clientId === res.clientId) { st.ultimo = res; pintarTicket(); toast('Recibida: ' + dur(res.inicio, res.termino) + ' de espera.'); }
+      guardar(); pintarRed(); pintarLista();
+      return enviarCola();
+    }, function (err) {
+      st.enviando = false;
+      if (esErrorRed(err)) { pintarRed(); return; }
+      st.cola.shift();
+      st.envios = st.envios.filter(function (u) { return u.clientId !== op.data.clientId; });
+      if (st.ultimo && st.ultimo.clientId === op.data.clientId) { st.ultimo = null; $('btnEnviar').hidden = false; $('btnOtra').hidden = true; pintarTicket(); }
+      guardar(); pintarRed(); pintarLista();
+      aviso('No se pudo registrar: ' + ((err && err.message) || err));
+      return enviarCola();
+    });
+  }
+  window.addEventListener('online', function () { pintarRed(); enviarCola(); });
+  window.addEventListener('offline', pintarRed);
+  setInterval(function () { if (st.cola.length) enviarCola(); }, 30000);
+
+  /* ---------- mis envíos ---------- */
+  function pintarLista(estado) {
+    var el = $('lista');
+    if (estado === 'cargando' && !st.envios.length) { el.innerHTML = '<span class="skeleton"></span><span class="skeleton"></span>'; return; }
+    if (!st.envios.length) { el.innerHTML = '<p class="muted small">Aún no envías horas de espera desde este celular.</p>'; return; }
+    el.innerHTML = '<ul class="mini">' + st.envios.slice(0, 10).map(function (u) {
+      return '<li><span class="mono">' + esc(u.equipo) + ' ' + esc(u.localidad) + '</span>' +
+        (u.pendiente ? '<span class="tag tag--grey">Por enviar</span>' : '<span class="tag">Recibida</span>') +
+        '<span class="muted">' + esc(diaMes(u.inicio)) + ', ' + esc(hhmm(u.inicio)) + ' a ' + esc(hhmm(u.termino)) + ', DT ' + esc(u.doc) + '</span>' +
+        '<span class="mono">' + dur(u.inicio, u.termino) + '</span></li>';
+    }).join('') + '</ul>';
+  }
+  function refrescar() {
+    if (st.cola.length) return;
+    pintarLista('cargando');
+    api('misRegistros', st.pin, st.nombre).then(function (rows) {
+      if (st.cola.length) return;
+      st.envios = rows; guardar(); pintarLista();
+    }, function (err) {
+      pintarLista();
+      if (!esErrorRed(err)) aviso('No se pudo cargar tu historial: ' + ((err && err.message) || err));
+    });
+  }
+
+  /* ---------- arranque ---------- */
+  aplicarCatalogo(); pintarRed(); ver('vPin'); $('pin').focus();
+  if (st.cola.length) { st.pin = st.cola[0].pin; enviarCola(); }
+})();
+</script>
+<script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});</script>
+</body>
+</html>
