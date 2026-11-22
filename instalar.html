@@ -40,8 +40,6 @@
     .btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--color-ink); }
     .btn:focus-visible, .link:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
     .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-    .btn--quiet { background: transparent; box-shadow: none; font: 500 1rem var(--font-body); min-height: 48px; white-space: nowrap; }
-    .btn--quiet:hover { background: var(--color-paper-2); }
     .pasos { width: 100%; margin: 0; padding: 16px 16px 16px 20px; list-style: none; counter-reset: p; text-align: left; background: var(--color-paper-2); box-shadow: inset 4px 0 0 var(--color-accent); display: grid; gap: 12px; }
     .pasos li { counter-increment: p; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 8px; align-items: start; }
     .pasos li::before { content: counter(p); display: grid; place-items: center; width: 28px; height: 28px; background: var(--color-ink); color: var(--color-on-ink); font: 700 1rem var(--font-display); }
@@ -88,7 +86,6 @@
       <p><b>Listo, la app quedó instalada.</b> Búscala en tu pantalla como <b>HDE Stange</b> y entra con el PIN que te dio la empresa.</p>
     </section>
 
-    <a class="btn btn--quiet" href="./" id="btnAbrir">Abrir sin instalar</a>
   </main>
   <noscript><p style="text-align:center">Para instalar: menú del navegador &gt; Instalar app o Agregar a pantalla principal.</p></noscript>
 
