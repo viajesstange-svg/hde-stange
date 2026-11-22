@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Instalar HDE Stange</title>
+  <meta name="description" content="Instala en tu teléfono la app de horas de espera de Transportes Stange.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icono-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="icono-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="HDE Stange">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Archivo:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Hallmark · shape: app screen (install page) · theme: Wayfind × Formwork (mezcla B) · signature: the app icon over one install action · states: installable, iphone, installed, unsupported · v2.0.0 */
+    :root {
+      --color-paper: oklch(95.5% 0.006 250); --color-paper-2: oklch(91% 0.009 250); --color-surface: oklch(99.5% 0.005 250);
+      --color-ink: oklch(16% 0.014 262); --color-muted: oklch(47% 0.016 260); --color-on-ink: oklch(95.5% 0.006 250);
+      --color-accent: oklch(66% 0.21 38); --color-accent-ink: oklch(16% 0.014 262); --color-accent-soft: oklch(93% 0.045 50); --color-accent-deep: oklch(60% 0.2 38); --color-focus: oklch(55% 0.2 38);
+      --font-display: "Oswald", "Arial Narrow", sans-serif; --font-body: "Archivo", system-ui, sans-serif;
+      --dur-micro: 120ms; --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { overflow-x: clip; }
+    body { margin: 0; min-height: 100vh; background: var(--color-paper); color: var(--color-ink); font-family: var(--font-body); font-size: 1rem; line-height: 1.5; }
+    .bar { background: var(--color-ink); color: var(--color-on-ink); padding: 12px 16px; font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; box-shadow: inset 0 -4px 0 var(--color-accent); }
+    main { max-width: 480px; margin: 0 auto; padding: 32px 16px 48px; display: grid; gap: 20px; justify-items: center; text-align: center; }
+    main > section { width: 100%; }
+    .icono { width: 144px; height: 144px; border-radius: 28px; display: block; }
+    h1 { text-wrap: balance; margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 2.1rem; line-height: 1.05; overflow-wrap: break-word; min-width: 0; }
+    p { margin: 0; max-width: 45ch; }
+    .muted { color: var(--color-muted); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 60px; padding: 0 24px; border: 2px solid var(--color-ink);
+      background: var(--color-accent); color: var(--color-accent-ink); font: 700 1.35rem var(--font-display); cursor: pointer; text-decoration: none;
+      box-shadow: 4px 4px 0 var(--color-ink); transition: transform var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out); }
+    .btn:hover { background: var(--color-accent-deep); }
+    .btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--color-ink); }
+    .btn:focus-visible, .link:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .btn--quiet { background: transparent; box-shadow: none; font: 500 1rem var(--font-body); min-height: 48px; white-space: nowrap; }
+    .btn--quiet:hover { background: var(--color-paper-2); }
+    .pasos { width: 100%; margin: 0; padding: 16px 16px 16px 20px; list-style: none; counter-reset: p; text-align: left; background: var(--color-paper-2); box-shadow: inset 4px 0 0 var(--color-accent); display: grid; gap: 12px; }
+    .pasos li { counter-increment: p; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 8px; align-items: start; }
+    .pasos li::before { content: counter(p); display: grid; place-items: center; width: 28px; height: 28px; background: var(--color-ink); color: var(--color-on-ink); font: 700 1rem var(--font-display); }
+    .link { color: var(--color-ink); font-weight: 500; text-decoration: underline; text-decoration-color: var(--color-accent); text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
+    [hidden] { display: none !important; }
+    ::selection { background: var(--color-accent-soft); color: var(--color-ink); }
+    html { scrollbar-color: var(--color-muted) var(--color-paper); }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="bar">Transportes Stange</div>
+  <main>
+    <img class="icono" src="icono-512.png" width="144" height="144" alt="Ícono de la app HDE Stange">
+    <h1>App de horas de espera</h1>
+    <p class="muted" id="intro">Instálala en tu teléfono. Queda como un ícono más, igual que WhatsApp.</p>
+
+    <!-- Android y computadores: botón directo -->
+    <section id="vAndroid" hidden>
+      <button type="button" class="btn" id="btnInstalar">Instalar app</button>
+    </section>
+
+    <!-- iPhone: Safari no tiene botón de instalar, se hace desde Compartir -->
+    <section id="vIphone" hidden>
+      <ol class="pasos">
+        <li><span>Toca el botón <b>Compartir</b> de Safari (el cuadrado con una flecha hacia arriba, abajo en la pantalla).</span></li>
+        <li><span>Baja y toca <b>Agregar a inicio</b>.</span></li>
+        <li><span>Toca <b>Agregar</b>. Aparece el ícono <b>HDE Stange</b>.</span></li>
+      </ol>
+      <p class="muted" id="noSafari" hidden>Abre este link en <b>Safari</b>; en otros navegadores del iPhone no se puede instalar.</p>
+    </section>
+
+    <!-- Android sin botón automático (otros navegadores) -->
+    <section id="vManual" hidden>
+      <ol class="pasos">
+        <li><span>Toca el menú del navegador (los <b>3 puntos</b>, arriba a la derecha).</span></li>
+        <li><span>Toca <b>Instalar app</b> o <b>Agregar a pantalla principal</b>.</span></li>
+        <li><span>Confirma. Aparece el ícono <b>HDE Stange</b>.</span></li>
+      </ol>
+    </section>
+
+    <!-- Ya instalada -->
+    <section id="vListo" hidden>
+      <p><b>Listo, la app quedó instalada.</b> Búscala en tu pantalla como <b>HDE Stange</b> y entra con el PIN que te dio la empresa.</p>
+    </section>
+
+    <a class="btn btn--quiet" href="./" id="btnAbrir">Abrir sin instalar</a>
+  </main>
+  <noscript><p style="text-align:center">Para instalar: menú del navegador &gt; Instalar app o Agregar a pantalla principal.</p></noscript>
+
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var ua = navigator.userAgent || '';
+      var iphone = /iPhone|iPad|iPod/i.test(ua);
+      var safari = iphone && !/CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
+      var instalada = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+      var evento = null;
+
+      if (instalada) { location.replace('./'); return; }
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+
+      function ver(id) { ['vAndroid', 'vIphone', 'vManual', 'vListo'].forEach(function (v) { $(v).hidden = v !== id; }); }
+
+      if (iphone) { ver('vIphone'); $('noSafari').hidden = safari; return; }
+
+      // Mientras el navegador decide si ofrece instalar, se muestran los pasos manuales.
+      ver('vManual');
+      window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); evento = e; ver('vAndroid'); });
+      $('btnInstalar').addEventListener('click', function () {
+        if (!evento) { ver('vManual'); return; }
+        evento.prompt();
+        evento.userChoice.then(function (r) { if (r.outcome === 'accepted') ver('vListo'); evento = null; });
+      });
+      window.addEventListener('appinstalled', function () { ver('vListo'); });
+    })();
+  </script>
+</body>
+</html>
